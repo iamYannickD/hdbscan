@@ -13,8 +13,8 @@
 .. image:: https://travis-ci.org/scikit-learn-contrib/hdbscan.svg
     :target: https://travis-ci.org/scikit-learn-contrib/hdbscan
     :alt: Travis Build Status
-.. image:: https://coveralls.io/repos/github/scikit-learn-contrib/hdbscan/badge.svg?branch=master
-    :target: https://coveralls.io/github/scikit-learn-contrib/hdbscan?branch=master
+.. image:: https://codecov.io/gh/scikit-learn-contrib/hdbscan/branch/master/graph/badge.svg
+  :target: https://codecov.io/gh/scikit-learn-contrib/hdbscan
     :alt: Test Coverage
 .. image:: https://readthedocs.org/projects/hdbscan/badge/?version=latest
     :target: https://hdbscan.readthedocs.org
@@ -163,6 +163,40 @@ Based on the paper:
     *"Rates of convergence for the cluster tree."*
     In Advances in Neural Information Processing Systems, 2010.
 
+----------------
+Branch detection
+----------------
+
+The hdbscan package supports a branch-detection post-processing step 
+by `Bot et al. <https://arxiv.org/abs/2311.15887>`_. Cluster shapes,
+such as branching structures, can reveal interesting patterns 
+that are not expressed in density-based cluster hierarchies. The 
+BranchDetector class mimics the HDBSCAN API and can be used to
+detect branching hierarchies in clusters. It provides condensed 
+branch hierarchies, branch persistences, and branch memberships and 
+supports joblib's caching functionality. A notebook 
+`demonstrating the BranchDetector is available <http://nbviewer.jupyter.org/github/scikit-learn-contrib/hdbscan/blob/master/notebooks/How%20to%20detect%20branches.ipynb>`_.
+
+Example usage:
+
+.. code:: python
+
+    import hdbscan
+    from sklearn.datasets import make_blobs
+
+    data, _ = make_blobs(1000)
+
+    clusterer = hdbscan.HDBSCAN(branch_detection_data=True).fit(data)
+    branch_detector = hdbscan.BranchDetector().fit(clusterer)
+    branch_detector.cluster_approximation_graph_.plot(edge_width=0.1)
+
+
+Based on the paper:
+    D. M. Bot, J. Peeters, J. Liesenborgs and J. Aerts
+    *"FLASC: A Flare-Sensitive Clustering Algorithm: Extending HDBSCAN\* for Detecting Branches in Clusters"*
+    Arxiv 2311.15887, 2023.
+
+
 ----------
 Installing
 ----------
@@ -208,6 +242,7 @@ For a manual install of the latest code directly from GitHub:
 
 
 Alternatively download the package, install requirements, and manually run the installer:
+
 
 .. code:: bash
 
@@ -297,6 +332,24 @@ To reference the high performance algorithm developed in this library please cit
       pages={33--42},
       year={2017},
       organization={IEEE}
+    }
+
+If you used the branch-detection functionality in this codebase in a scientific publication and which to cite it, please use the `Arxiv preprint <https://arxiv.org/abs/2311.15887>`_: 
+
+    D. M. Bot, J. Peeters, J. Liesenborgs and J. Aerts
+    *"FLASC: A Flare-Sensitive Clustering Algorithm: Extending HDBSCAN\* for Detecting Branches in Clusters"*
+    Arxiv 2311.15887, 2023.
+
+.. code:: bibtex
+
+    @misc{bot2023flasc,
+        title={FLASC: A Flare-Sensitive Clustering Algorithm: Extending HDBSCAN* for Detecting Branches in Clusters}, 
+        author={D. M. Bot and J. Peeters and J. Liesenborgs and J. Aerts},
+        year={2023},
+        eprint={2311.15887},
+        archivePrefix={arXiv},
+        primaryClass={cs.LG},
+        url={https://arxiv.org/abs/2311.15887}, 
     }
 
 ---------

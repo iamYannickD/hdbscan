@@ -25,6 +25,8 @@ User Guide / Tutorial
    prediction_tutorial
    soft_clustering
    how_to_use_epsilon
+   dbscan_from_hdbscan
+   how_to_detect_branches
    faq
 
 Background on Clustering with HDBSCAN

@@ -9,7 +9,6 @@ from sklearn.metrics import pairwise_distances
 from scipy.sparse import issparse
 
 from joblib import Memory
-import six
 from sklearn.utils import check_array
 
 from ._hdbscan_linkage import mst_linkage_core, mst_linkage_core_vector, label
@@ -24,8 +23,22 @@ from warnings import warn
 # Author: Leland McInnes <leland.mcinnes@gmail.com>
 #
 # License: BSD 3 clause
-
-FAST_METRICS = KDTree.valid_metrics + BallTree.valid_metrics
+KDTREE_VALID_METRICS = ["euclidean", "l2", "minkowski", "p", "manhattan", "cityblock", "l1", "chebyshev", "infinity"]
+BALLTREE_VALID_METRICS = KDTREE_VALID_METRICS + [
+    "braycurtis",
+    "canberra",
+    "dice",
+    "hamming",
+    "haversine",
+    "jaccard",
+    "mahalanobis",
+    "rogerstanimoto",
+    "russellrao",
+    "seuclidean",
+    "sokalmichener",
+    "sokalsneath",
+]
+FAST_METRICS = KDTREE_VALID_METRICS + BALLTREE_VALID_METRICS
 
 
 def _rsl_generic(X, k=5, alpha=1.4142135623730951, metric='euclidean',
@@ -136,7 +149,7 @@ def _rsl_boruvka_balltree(X, k=5, alpha=1.0,
 
 def robust_single_linkage(X, cut, k=5, alpha=1.4142135623730951,
                           gamma=5, metric='euclidean', algorithm='best',
-                          memory=Memory(cachedir=None, verbose=0), leaf_size=40,
+                          memory=Memory(None, verbose=0), leaf_size=40,
                           core_dist_n_jobs=4, **kwargs):
     """Perform robust single linkage clustering from a vector array
     or distance matrix.
@@ -239,8 +252,8 @@ def robust_single_linkage(X, cut, k=5, alpha=1.4142135623730951,
                              ' defined!')
 
     X = check_array(X, accept_sparse='csr')
-    if isinstance(memory, six.string_types):
-        memory = Memory(cachedir=memory, verbose=0)
+    if isinstance(memory, str):
+        memory = Memory(memory, verbose=0)
 
     if algorithm != 'best':
         if algorithm == 'generic':
@@ -267,7 +280,7 @@ def robust_single_linkage(X, cut, k=5, alpha=1.4142135623730951,
             # We can't do much with sparse matrices ...
             single_linkage_tree = memory.cache(_rsl_generic)(
                 X, k, alpha, metric, **kwargs)
-        elif metric in KDTree.valid_metrics:
+        elif metric in KDTREE_VALID_METRICS:
             # Need heuristic to decide when to go to boruvka;
             # still debugging for now
             if X.shape[1] > 128:
